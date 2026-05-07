@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { products, CAtegories } from "../data/mockData";
+import { CAtegories } from "../data/mockData";
+import { useProducts } from "../hooks/useProducts";
 import { Filter } from "lucide-react";
 import { motion } from "motion/react";
 import { useCart } from "../context/CartContext";
@@ -8,6 +9,7 @@ import { useCart } from "../context/CartContext";
 export default function Shop() {
   const [activeCategory, setActiveCategory] = useState("All");
   const { addToCart } = useCart();
+  const { products, loading } = useProducts();
 
   const filteredProducts = activeCategory === "All" 
     ? products 
@@ -44,7 +46,7 @@ export default function Shop() {
             transition={{ duration: 0.6, delay: 0.2 }}
           >
             <div className="sticky top-32">
-              <div className="flex items-center gap-2 mb-6 uppercase tracking-widest font-semibold text-xs border-b border-white/10 pb-4">
+              <div className="flex items-center gap-2 mb-6 uppercase tracking-widest font-semibold text-xs border-b border-ink/10 pb-4">
                 <Filter className="w-4 h-4" />
                 Categories
               </div>
@@ -96,7 +98,7 @@ export default function Shop() {
                   transition={{ duration: 0.5 }}
                 >
                   <Link to={`/product/${product.id}`} className="group block">
-                    <div className="aspect-[4/5] overflow-hidden mb-4 bg-white/5 relative border border-white/5">
+                    <div className="aspect-[4/5] overflow-hidden mb-4 bg-white/5 relative border border-ink/5">
                       <img 
                         src={product.images[0]} 
                         alt={product.name} 

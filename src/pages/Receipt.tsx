@@ -22,12 +22,12 @@ export default function Receipt() {
            animate={{ opacity: 1, scale: 1 }}
            transition={{ duration: 0.6 }}
         >
-          <div className="bg-[#111111] text-[#F5F5F0] border border-white/10 p-8 md:p-12 shadow-2xl relative overflow-hidden">
+          <div className="bg-espresso text-ink border border-ink/10 p-8 md:p-12 shadow-2xl relative overflow-hidden">
             {/* Watermark / Design */}
             <div className="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 border-[40px] border-terracotta/5 rounded-full pointer-events-none"></div>
 
             {/* Header */}
-            <div className="flex flex-col items-center text-center border-b border-white/10 pb-8 mb-8">
+            <div className="flex flex-col items-center text-center border-b border-ink/10 pb-8 mb-8">
               <div className="w-16 h-16 bg-[#25D366]/10 rounded-full flex items-center justify-center mb-6">
                 <CheckCircle className="w-8 h-8 text-[#25D366]" />
               </div>
@@ -35,7 +35,7 @@ export default function Receipt() {
               <p className="text-sm opacity-60 mb-6">Thank you for shopping with Don Palace Furniture. Your order has been placed.</p>
               
               <div className="flex gap-4">
-                <button onClick={handlePrint} className="flex items-center gap-2 text-xs uppercase tracking-widest font-semibold border border-white/20 px-6 py-2 hover:bg-white/5 transition-colors">
+                <button onClick={handlePrint} className="flex items-center gap-2 text-xs uppercase tracking-widest font-semibold border border-ink/20 px-6 py-2 hover:bg-white/5 transition-colors">
                   <Printer className="w-4 h-4" /> Print Receipt
                 </button>
                 <div className="bg-[#25D366]/10 text-[#25D366] px-6 py-2 text-xs uppercase tracking-widest font-semibold flex items-center gap-2">
@@ -48,15 +48,15 @@ export default function Receipt() {
             <div className="grid grid-cols-2 gap-y-6 text-sm mb-12">
               <div>
                 <p className="text-[10px] uppercase tracking-widest opacity-50 mb-1">Order ID</p>
-                <p className="font-semibold font-mono">{receipt.orderId}</p>
+                <p className="font-semibold font-mono">{receipt.id || receipt.orderId}</p>
               </div>
               <div>
                 <p className="text-[10px] uppercase tracking-widest opacity-50 mb-1">Date</p>
-                <p className="font-semibold">{new Date(receipt.date).toLocaleString()}</p>
+                <p className="font-semibold">{new Date(receipt.createdAt || receipt.date).toLocaleString()}</p>
               </div>
               <div>
                 <p className="text-[10px] uppercase tracking-widest opacity-50 mb-1">Customer</p>
-                <p className="font-semibold">{receipt.customer.fullName}</p>
+                <p className="font-semibold">{receipt.customer.firstName} {receipt.customer.lastName}</p>
                 <p className="opacity-80">{receipt.customer.phone}</p>
                 <p className="opacity-80">{receipt.customer.email}</p>
               </div>
@@ -72,7 +72,7 @@ export default function Receipt() {
             </div>
 
             {/* Items Table */}
-            <div className="border-t border-b border-white/10 py-6 mb-8">
+            <div className="border-t border-b border-ink/10 py-6 mb-8">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="text-left text-[10px] uppercase tracking-widest opacity-50">
@@ -85,11 +85,10 @@ export default function Receipt() {
                   {receipt.items.map((item: any, idx: number) => (
                     <tr key={idx}>
                       <td className="py-4">
-                        <p className="font-semibold">{item.product.name}</p>
-                        <p className="text-xs opacity-60">{item.product.category}</p>
+                        <p className="font-semibold">{item.name || item.product?.name}</p>
                       </td>
                       <td className="py-4 text-right">{item.quantity}</td>
-                      <td className="py-4 text-right">KES {(item.product.price * item.quantity).toLocaleString()}</td>
+                      <td className="py-4 text-right">KES {((item.price || item.product?.price || 0) * item.quantity).toLocaleString()}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -100,15 +99,15 @@ export default function Receipt() {
             <div className="flex flex-col items-end text-sm space-y-4">
               <div className="flex justify-between w-full md:w-1/2">
                 <span className="opacity-60">Subtotal</span>
-                <span>KES {(receipt.total - receipt.deliveryFee).toLocaleString()}</span>
+                <span>KES {(receipt.total || 0).toLocaleString()}</span>
               </div>
               <div className="flex justify-between w-full md:w-1/2">
                 <span className="opacity-60">Delivery Fee</span>
-                <span>KES {receipt.deliveryFee.toLocaleString()}</span>
+                <span>KES {((receipt.deliveryFee) || 0).toLocaleString()}</span>
               </div>
-              <div className="flex justify-between w-full md:w-1/2 text-xl serif pt-4 border-t border-white/10">
+              <div className="flex justify-between w-full md:w-1/2 text-xl serif pt-4 border-t border-ink/10">
                 <span>Total</span>
-                <span className="text-terracotta">KES {receipt.total.toLocaleString()}</span>
+                <span className="text-terracotta">KES {(receipt.total || 0).toLocaleString()}</span>
               </div>
             </div>
             

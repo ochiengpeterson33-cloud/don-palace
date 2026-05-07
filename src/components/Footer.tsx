@@ -54,19 +54,19 @@ export function Footer() {
         <div>
           <h4 className="text-xs uppercase tracking-widest font-semibold mb-6">Follow Us</h4>
           <div className="flex space-x-4">
-            <a href="#" className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center hover:bg-terracotta hover:border-terracotta transition-all">
+            <a href="#" className="w-10 h-10 rounded-full border border-ink/20 flex items-center justify-center hover:bg-terracotta hover:border-terracotta transition-all">
               <Instagram className="w-4 h-4" />
             </a>
-            <a href="#" className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center hover:bg-terracotta hover:border-terracotta transition-all">
+            <a href="#" className="w-10 h-10 rounded-full border border-ink/20 flex items-center justify-center hover:bg-terracotta hover:border-terracotta transition-all">
               <Facebook className="w-4 h-4" />
             </a>
-            <a href="#" className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center hover:bg-terracotta hover:border-terracotta transition-all">
+            <a href="#" className="w-10 h-10 rounded-full border border-ink/20 flex items-center justify-center hover:bg-terracotta hover:border-terracotta transition-all">
               <Twitter className="w-4 h-4" />
             </a>
           </div>
         </div>
       </div>
-      <div className="container mx-auto max-w-7xl mt-16 pt-8 border-t border-white/10 text-xs font-light opacity-50 flex flex-col md:flex-row justify-between items-center">
+      <div className="container mx-auto max-w-7xl mt-16 pt-8 border-t border-ink/10 text-xs font-light opacity-50 flex flex-col md:flex-row justify-between items-center">
         <p>&copy; {new Date().getFullYear()} Don Palace Furniture. All rights reserved.</p>
         <p className="mt-4 md:mt-0">Designed in Nairobi, Kenya.</p>
       </div>

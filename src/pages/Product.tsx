@@ -1,15 +1,24 @@
 import { useParams, Link } from "react-router-dom";
-import { products } from "../data/mockData";
 import { ArrowLeft, Truck, ShieldCheck, MessageCircle, ShoppingBag, Plus, Minus } from "lucide-react";
 import { useState } from "react";
 import { motion } from "motion/react";
 import { useCart } from "../context/CartContext";
+import { useProducts } from "../hooks/useProducts";
 
 export default function Product() {
   const { id } = useParams();
+  const { products, loading } = useProducts();
   const product = products.find(p => p.id === id);
   const { addToCart } = useCart();
   const [quantity, setQuantity] = useState(1);
+
+  if (loading) {
+    return (
+      <div className="pt-40 pb-64 min-h-screen flex items-center justify-center bg-sand">
+        <div className="w-8 h-8 border-4 border-terracotta border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
   if (!product) {
     return (
@@ -48,7 +57,7 @@ export default function Product() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
-            <div className="aspect-[4/5] bg-white/5 border border-white/5 overflow-hidden block">
+            <div className="aspect-[4/5] bg-white/5 border border-ink/5 overflow-hidden block">
               <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover" />
             </div>
             {/* Future thumbnail gallery can go here */}
@@ -73,11 +82,11 @@ export default function Product() {
             </motion.p>
 
             <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }} className="space-y-6 mb-12">
-              <div className="flex justify-between border-b border-white/10 pb-4">
+              <div className="flex justify-between border-b border-ink/10 pb-4">
                 <span className="text-xs uppercase tracking-widest font-semibold opacity-60">Material</span>
                 <span className="text-sm font-medium text-right max-w-[60%]">{product.material}</span>
               </div>
-              <div className="flex justify-between border-b border-white/10 pb-4">
+              <div className="flex justify-between border-b border-ink/10 pb-4">
                 <span className="text-xs uppercase tracking-widest font-semibold opacity-60">Dimensions</span>
                 <span className="text-sm font-medium text-right">Available on request</span>
               </div>
@@ -85,7 +94,7 @@ export default function Product() {
 
             <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }} className="flex flex-col mb-12 gap-6">
                <div className="flex items-center gap-6">
-                 <div className="flex items-center border border-white/20 h-14">
+                 <div className="flex items-center border border-ink/20 h-14">
                    <button 
                      onClick={() => setQuantity(q => Math.max(1, q - 1))}
                      className="w-12 h-full flex items-center justify-center hover:bg-white/5 transition-colors"

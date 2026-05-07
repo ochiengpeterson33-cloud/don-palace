@@ -15,6 +15,9 @@ export default function Checkout() {
     phone: "",
     address: "",
     city: "",
+    cardNumber: "",
+    cardExpiry: "",
+    cardCvv: "",
   });
 
   const [paymentMethod, setPaymentMethod] = useState("mpesa");
@@ -35,25 +38,33 @@ export default function Checkout() {
     setIsProcessing(true);
 
     try {
-      const response = await fetch("/api/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          items: cart,
-          customer: formData,
-          paymentMethod,
-        }),
-      });
+      const { collection, addDoc, serverTimestamp } = await import("firebase/firestore");
+      const { db } = await import("../lib/firebase");
 
-      const data = await response.json();
+      const orderData = {
+        items: cart.map(item => ({
+          productId: item.product.id,
+          name: item.product.name,
+          price: item.product.price,
+          quantity: item.quantity,
+          image: item.product.images[0]
+        })),
+        total,
+        paymentMethod,
+        customerEmail: formData.email,
+        customerPhone: formData.phone,
+        shippingAddress: `${formData.address}, ${formData.city}`,
+        status: "pending",
+        createdAt: serverTimestamp()
+      };
+
+      const docRef = await addDoc(collection(db, "orders"), orderData);
       
-      if (data.success) {
-        clearCart();
-        // Pass data via state to receipt page
-        navigate(`/receipt`, { state: { receipt: data.receipt } });
-      }
+      clearCart();
+      navigate(`/receipt`, { state: { receipt: { id: docRef.id, ...orderData, createdAt: new Date().toISOString(), customer: formData } } });
     } catch (error) {
       console.error("Checkout failed:", error);
+      alert("Checkout failed. Please try again.");
     } finally {
       setIsProcessing(false);
     }
@@ -73,7 +84,7 @@ export default function Checkout() {
   }
 
   return (
-    <div className="py-32 px-6 md:px-12 bg-[#0A0A0A] text-[#F5F5F0] min-h-screen">
+    <div className="py-32 px-6 md:px-12 bg-sand text-ink min-h-screen">
       <div className="container mx-auto max-w-6xl">
         <motion.div
            initial={{ opacity: 0, x: -20 }}
@@ -92,10 +103,10 @@ export default function Checkout() {
             transition={{ duration: 0.6 }}
           >
             <h1 className="text-4xl serif mb-10">Checkout</h1>
-            <form onSubmit={handleSubmit} className="space-y-8">
+            <form id="checkout-form" onSubmit={handleSubmit} className="space-y-8">
               {/* Customer Details */}
               <div className="space-y-4">
-                <h2 className="text-xs uppercase tracking-widest font-semibold text-terracotta border-b border-white/10 pb-4 mb-6">Customer Details</h2>
+                <h2 className="text-xs uppercase tracking-widest font-semibold text-terracotta border-b border-ink/10 pb-4 mb-6">Customer Details</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <input
                     type="text"
@@ -104,7 +115,7 @@ export default function Checkout() {
                     onChange={handleChange}
                     placeholder="Full Name"
                     required
-                    className="w-full bg-[#111111] border border-white/10 p-4 text-sm focus:outline-none focus:border-terracotta transition-colors"
+                    className="w-full bg-espresso border border-ink/10 p-4 text-sm focus:outline-none focus:border-terracotta transition-colors"
                   />
                   <input
                     type="email"
@@ -113,7 +124,7 @@ export default function Checkout() {
                     onChange={handleChange}
                     placeholder="Email Address"
                     required
-                    className="w-full bg-[#111111] border border-white/10 p-4 text-sm focus:outline-none focus:border-terracotta transition-colors"
+                    className="w-full bg-espresso border border-ink/10 p-4 text-sm focus:outline-none focus:border-terracotta transition-colors"
                   />
                   <input
                     type="tel"
@@ -122,14 +133,14 @@ export default function Checkout() {
                     onChange={handleChange}
                     placeholder="Phone Number (e.g. 07XXXXXXXX)"
                     required
-                    className="w-full bg-[#111111] border border-white/10 p-4 text-sm focus:outline-none focus:border-terracotta transition-colors sm:col-span-2"
+                    className="w-full bg-espresso border border-ink/10 p-4 text-sm focus:outline-none focus:border-terracotta transition-colors sm:col-span-2"
                   />
                 </div>
               </div>
 
               {/* Delivery Details */}
               <div className="space-y-4 pt-4">
-                <h2 className="text-xs uppercase tracking-widest font-semibold text-terracotta border-b border-white/10 pb-4 mb-6">Delivery Address</h2>
+                <h2 className="text-xs uppercase tracking-widest font-semibold text-terracotta border-b border-ink/10 pb-4 mb-6">Delivery Address</h2>
                 <div className="grid grid-cols-1 gap-4">
                   <input
                     type="text"
@@ -138,7 +149,7 @@ export default function Checkout() {
                     onChange={handleChange}
                     placeholder="Street Address, Area"
                     required
-                    className="w-full bg-[#111111] border border-white/10 p-4 text-sm focus:outline-none focus:border-terracotta transition-colors"
+                    className="w-full bg-espresso border border-ink/10 p-4 text-sm focus:outline-none focus:border-terracotta transition-colors"
                   />
                   <input
                     type="text"
@@ -147,18 +158,23 @@ export default function Checkout() {
                     onChange={handleChange}
                     placeholder="City / Town"
                     required
-                    className="w-full bg-[#111111] border border-white/10 p-4 text-sm focus:outline-none focus:border-terracotta transition-colors"
+                    className="w-full bg-espresso border border-ink/10 p-4 text-sm focus:outline-none focus:border-terracotta transition-colors"
                   />
                 </div>
               </div>
 
               {/* Payment Method */}
               <div className="space-y-4 pt-4">
-                <h2 className="text-xs uppercase tracking-widest font-semibold text-terracotta border-b border-white/10 pb-4 mb-6">Payment Method</h2>
+                <h2 className="text-xs uppercase tracking-widest font-semibold text-terracotta border-b border-ink/10 pb-4 mb-6">Payment Method</h2>
                 <div className="grid grid-cols-1 gap-4">
-                  <label className={`flex items-center p-4 border cursor-pointer transition-colors ${paymentMethod === 'mpesa' ? 'border-terracotta bg-terracotta/5' : 'border-white/10 bg-[#111111] hover:border-white/20'}`}>
+                  <label className={`flex items-center p-4 border cursor-pointer transition-colors ${paymentMethod === 'mpesa' ? 'border-terracotta bg-terracotta/5' : 'border-ink/10 bg-espresso hover:border-ink/20'}`}>
                     <input type="radio" value="mpesa" checked={paymentMethod === 'mpesa'} onChange={() => setPaymentMethod('mpesa')} className="sr-only" />
-                    <Smartphone className="w-6 h-6 mr-4 text-[#25D366]" />
+                    <div className="mr-4 w-14 h-8 shrink-0 flex items-center justify-center">
+                      <svg viewBox="0 0 100 40" width="100%" height="100%">
+                        <rect width="100" height="40" rx="6" fill="#4CAF50"/>
+                        <text x="50" y="26" fill="white" fontFamily="sans-serif" fontWeight="bold" fontSize="18" textAnchor="middle">M-PESA</text>
+                      </svg>
+                    </div>
                     <div className="flex-1">
                       <p className="font-semibold text-sm">M-Pesa STK Push</p>
                       <p className="text-xs opacity-60">Instant mobile payment</p>
@@ -166,19 +182,66 @@ export default function Checkout() {
                     {paymentMethod === 'mpesa' && <CheckCircle className="w-5 h-5 text-terracotta" />}
                   </label>
                   
-                  <label className={`flex items-center p-4 border cursor-pointer transition-colors ${paymentMethod === 'visa' ? 'border-terracotta bg-terracotta/5' : 'border-white/10 bg-[#111111] hover:border-white/20'}`}>
-                    <input type="radio" value="visa" checked={paymentMethod === 'visa'} onChange={() => setPaymentMethod('visa')} className="sr-only" />
-                    <CreditCard className="w-6 h-6 mr-4 text-blue-400" />
-                    <div className="flex-1">
-                      <p className="font-semibold text-sm">Visa / Mastercard</p>
-                      <p className="text-xs opacity-60">Secure card payment</p>
-                    </div>
-                    {paymentMethod === 'visa' && <CheckCircle className="w-5 h-5 text-terracotta" />}
-                  </label>
+                  <div className={`border transition-colors ${paymentMethod === 'visa' ? 'border-terracotta bg-terracotta/5' : 'border-ink/10 bg-espresso hover:border-ink/20'}`}>
+                    <label className="flex items-center p-4 cursor-pointer">
+                      <input type="radio" value="visa" checked={paymentMethod === 'visa'} onChange={() => setPaymentMethod('visa')} className="sr-only" />
+                      <div className="mr-4 w-14 h-8 shrink-0 flex items-center justify-center bg-white rounded shadow-sm border border-black/10">
+                        <svg viewBox="0 0 100 40" width="100%" height="100%">
+                          <text x="50" y="29" fill="#1434CB" fontFamily="sans-serif" fontWeight="900" fontStyle="italic" fontSize="26" textAnchor="middle">VISA</text>
+                        </svg>
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-semibold text-sm">Visa / Mastercard</p>
+                        <p className="text-xs opacity-60">Secure card payment</p>
+                      </div>
+                      {paymentMethod === 'visa' && <CheckCircle className="w-5 h-5 text-terracotta" />}
+                    </label>
+                    {paymentMethod === 'visa' && (
+                      <div className="px-4 pb-4">
+                        <div className="space-y-3 mt-2">
+                          <input
+                            type="text"
+                            name="cardNumber"
+                            value={formData.cardNumber}
+                            onChange={handleChange}
+                            placeholder="Card Number"
+                            required={paymentMethod === 'visa'}
+                            className="w-full bg-white/10 border border-ink/20 p-3 text-sm focus:outline-none focus:border-terracotta transition-colors text-ink placeholder-ink/50"
+                          />
+                          <div className="grid grid-cols-2 gap-3">
+                            <input
+                              type="text"
+                              name="cardExpiry"
+                              value={formData.cardExpiry}
+                              onChange={handleChange}
+                              placeholder="MM/YY"
+                              required={paymentMethod === 'visa'}
+                              className="w-full bg-white/10 border border-ink/20 p-3 text-sm focus:outline-none focus:border-terracotta transition-colors text-ink placeholder-ink/50"
+                            />
+                            <input
+                              type="text"
+                              name="cardCvv"
+                              value={formData.cardCvv}
+                              onChange={handleChange}
+                              placeholder="CVV"
+                              required={paymentMethod === 'visa'}
+                              className="w-full bg-white/10 border border-ink/20 p-3 text-sm focus:outline-none focus:border-terracotta transition-colors text-ink placeholder-ink/50"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
 
-                  <label className={`flex items-center p-4 border cursor-pointer transition-colors ${paymentMethod === 'airtel' ? 'border-terracotta bg-terracotta/5' : 'border-white/10 bg-[#111111] hover:border-white/20'}`}>
+                  <label className={`flex items-center p-4 border cursor-pointer transition-colors ${paymentMethod === 'airtel' ? 'border-terracotta bg-terracotta/5' : 'border-ink/10 bg-espresso hover:border-ink/20'}`}>
                     <input type="radio" value="airtel" checked={paymentMethod === 'airtel'} onChange={() => setPaymentMethod('airtel')} className="sr-only" />
-                    <Smartphone className="w-6 h-6 mr-4 text-[#FF0000]" />
+                    <div className="mr-4 w-14 h-8 shrink-0 flex items-center justify-center">
+                      <svg viewBox="0 0 100 40" width="100%" height="100%">
+                        <rect width="100" height="40" rx="20" fill="#FF0000"/>
+                        <text x="50" y="24" fill="white" fontFamily="sans-serif" fontWeight="900" fontSize="18" textAnchor="middle" letterSpacing="-0.5">airtel</text>
+                        <text x="50" y="34" fill="white" fontFamily="sans-serif" fontWeight="bold" fontSize="8" textAnchor="middle">money</text>
+                      </svg>
+                    </div>
                     <div className="flex-1">
                       <p className="font-semibold text-sm">Airtel Money</p>
                       <p className="text-xs opacity-60">Pay with Airtel</p>
@@ -197,7 +260,7 @@ export default function Checkout() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <div className="bg-[#111111] border border-white/5 p-8 sticky top-32">
+            <div className="bg-espresso border border-ink/5 p-8 sticky top-32">
               <h2 className="text-xl serif mb-6">Order Summary</h2>
               
               <div className="space-y-4 mb-6">
@@ -217,7 +280,7 @@ export default function Checkout() {
                 ))}
               </div>
 
-              <div className="border-t border-white/10 pt-4 space-y-4 mb-8 text-sm">
+              <div className="border-t border-ink/10 pt-4 space-y-4 mb-8 text-sm">
                 <div className="flex justify-between opacity-80">
                   <span>Subtotal</span>
                   <span>KES {cartTotal.toLocaleString()}</span>
@@ -226,14 +289,15 @@ export default function Checkout() {
                   <span>Delivery Fee</span>
                   <span>KES {deliveryFee.toLocaleString()}</span>
                 </div>
-                <div className="flex justify-between text-xl serif pt-4 border-t border-white/10">
+                <div className="flex justify-between text-xl serif pt-4 border-t border-ink/10">
                   <span>Total</span>
                   <span className="text-terracotta">KES {total.toLocaleString()}</span>
                 </div>
               </div>
 
               <button
-                onClick={handleSubmit}
+                type="submit"
+                form="checkout-form"
                 disabled={isProcessing}
                 className="w-full bg-terracotta text-black py-4 uppercase tracking-widest text-xs font-bold hover:bg-[#D4B476] transition-colors disabled:opacity-50 flex items-center justify-center"
               >

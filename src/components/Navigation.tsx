@@ -1,14 +1,16 @@
 import { Link, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { Menu, X, ShoppingBag } from "lucide-react";
+import { Menu, X, ShoppingBag, Sun, Moon } from "lucide-react";
 import { cn } from "../lib/utils";
 import { useCart } from "../context/CartContext";
+import { useTheme } from "../context/ThemeContext";
 
 export function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
   const { cart, setIsCartOpen } = useCart();
+  const { isDarkMode, toggleTheme } = useTheme();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -73,6 +75,9 @@ export function Navigation() {
         </nav>
 
         <div className="hidden md:flex items-center space-x-6">
+          <button onClick={toggleTheme} className="hover:text-terracotta transition-colors" aria-label="Toggle Dark Mode">
+            {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+          </button>
           <button onClick={() => setIsCartOpen(true)} className="relative hover:text-terracotta transition-colors">
             <ShoppingBag className="w-5 h-5" />
             {cart.length > 0 && (
@@ -84,18 +89,23 @@ export function Navigation() {
         </div>
 
         {/* Mobile Toggle */}
-        <button
-          className="md:hidden p-2"
-          onClick={() => setMobileMenuOpen(true)}
-        >
-          <Menu className="w-6 h-6" />
-        </button>
+        <div className="md:hidden flex items-center gap-4">
+          <button onClick={toggleTheme} className="hover:text-terracotta transition-colors" aria-label="Toggle Dark Mode">
+            {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+          </button>
+          <button
+            className="p-2"
+            onClick={() => setMobileMenuOpen(true)}
+          >
+            <Menu className="w-6 h-6" />
+          </button>
+        </div>
       </div>
 
       {/* Mobile Menu */}
       <div
         className={cn(
-          "fixed inset-0 bg-sand z-50 transition-transform duration-500 ease-in-out px-6 py-8 flex flex-col",
+          "fixed inset-0 bg-sand z-[60] transition-transform duration-500 ease-in-out px-6 py-8 flex flex-col",
           mobileMenuOpen ? "translate-x-0" : "translate-x-full"
         )}
       >
@@ -118,6 +128,9 @@ export function Navigation() {
               {link.name}
             </Link>
           ))}
+          <button className="text-left text-2xl serif transition-colors hover:text-terracotta mt-8" onClick={() => { setIsCartOpen(true); setMobileMenuOpen(false); }}>
+            Cart ({cart.length})
+          </button>
         </nav>
       </div>
     </header>

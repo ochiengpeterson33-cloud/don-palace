@@ -23,10 +23,10 @@ export function CartSidebar() {
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="fixed top-0 right-0 h-full w-full sm:w-[450px] bg-[#111111] border-l border-white/10 z-50 flex flex-col shadow-2xl"
+            className="fixed top-0 right-0 h-full w-full sm:w-[450px] bg-espresso border-l border-ink/10 z-50 flex flex-col shadow-2xl"
           >
             {/* Header */}
-            <div className="flex items-center justify-between p-6 border-b border-white/5">
+            <div className="flex items-center justify-between p-6 border-b border-ink/5">
               <h2 className="text-xl serif flex items-center gap-3">
                 <ShoppingBag className="w-5 h-5 text-terracotta" />
                 Your Cart
@@ -36,7 +36,7 @@ export function CartSidebar() {
               </h2>
               <button
                 onClick={() => setIsCartOpen(false)}
-                className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/5 transition-colors border border-transparent hover:border-white/10"
+                className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/5 transition-colors border border-transparent hover:border-ink/10"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -52,7 +52,7 @@ export function CartSidebar() {
               ) : (
                 cart.map((item) => (
                   <div key={item.product.id} className="flex gap-4">
-                    <div className="w-24 h-30 bg-white/5 shrink-0 border border-white/5">
+                    <div className="w-24 h-30 bg-white/5 shrink-0 border border-ink/5">
                       <img
                         src={item.product.images[0]}
                         alt={item.product.name}
@@ -79,7 +79,7 @@ export function CartSidebar() {
                       </div>
                       
                       <div className="flex items-center gap-4 mt-4">
-                        <div className="flex items-center border border-white/10">
+                        <div className="flex items-center border border-ink/10">
                           <button
                             onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
                             className="w-8 h-8 flex items-center justify-center hover:bg-white/5 transition-colors"
@@ -103,7 +103,7 @@ export function CartSidebar() {
 
             {/* Footer */}
             {cart.length > 0 && (
-              <div className="p-6 border-t border-white/5 bg-[#0A0A0A]">
+              <div className="p-6 border-t border-ink/5 bg-sand">
                 <div className="flex justify-between items-center mb-6">
                   <span className="text-xs uppercase tracking-widest font-semibold opacity-60">Subtotal</span>
                   <span className="serif text-xl">KES {cartTotal.toLocaleString()}</span>

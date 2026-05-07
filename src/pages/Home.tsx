@@ -1,9 +1,11 @@
 import { ArrowRight, Star } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion } from "motion/react";
-import { products, testimonials, CAtegories } from "../data/mockData";
+import { testimonials, CAtegories } from "../data/mockData";
+import { useProducts } from "../hooks/useProducts";
 
 export default function Home() {
+  const { products } = useProducts();
   const featuredProducts = products.slice(0, 4);
 
   return (
@@ -54,7 +56,7 @@ export default function Home() {
               href="https://wa.me/254723886607" 
               target="_blank"
               rel="noopener noreferrer"
-              className="px-8 py-4 border border-white/20 text-white font-bold uppercase text-xs tracking-widest hover:bg-white/5 transition-colors duration-300 w-full sm:w-auto backdrop-blur-sm shadow-xl"
+              className="px-8 py-4 border border-ink/20 text-white font-bold uppercase text-xs tracking-widest hover:bg-white/5 transition-colors duration-300 w-full sm:w-auto backdrop-blur-sm shadow-xl"
             >
               Chat on WhatsApp
             </a>
@@ -87,7 +89,7 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: i * 0.1 }}
-                className="group relative aspect-[4/5] overflow-hidden cursor-pointer border border-white/5"
+                className="group relative aspect-[4/5] overflow-hidden cursor-pointer border border-ink/5"
               >
                 <img src={cat.img} alt={cat.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
                 <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-transparent to-transparent opacity-60 group-hover:opacity-80 transition-opacity"></div>
@@ -149,8 +151,8 @@ export default function Home() {
               viewport={{ once: true, margin: "-100px" }}
               transition={{ duration: 0.8, delay: 0.2 }}
             >
-              <img src="https://images.unsplash.com/photo-1616486029423-aaa4789e8c9a?q=80&w=600&auto=format&fit=crop" alt="Detail" className="h-80 object-cover w-full scale-95 border border-white/5" />
-              <img src="https://images.unsplash.com/photo-1618220179428-22790b46a013?q=80&w=600&auto=format&fit=crop" alt="Material" className="h-80 object-cover w-full mt-12 border border-white/5" />
+              <img src="https://images.unsplash.com/photo-1616486029423-aaa4789e8c9a?q=80&w=600&auto=format&fit=crop" alt="Detail" className="h-80 object-cover w-full scale-95 border border-ink/5" />
+              <img src="https://images.unsplash.com/photo-1618220179428-22790b46a013?q=80&w=600&auto=format&fit=crop" alt="Material" className="h-80 object-cover w-full mt-12 border border-ink/5" />
             </motion.div>
           </div>
         </div>
@@ -180,9 +182,9 @@ export default function Home() {
                   transition={{ duration: 0.5, delay: i * 0.1 }}
                 >
                   <Link to={`/product/${product.id}`} className="group block">
-                    <div className="aspect-square overflow-hidden bg-white/5 mb-4 relative border border-white/10">
+                    <div className="aspect-square overflow-hidden bg-white/5 mb-4 relative border border-ink/10">
                       <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-                      <div className="absolute top-4 right-4 bg-black/80 backdrop-blur-sm px-3 py-1 text-xs font-semibold text-white border border-white/10">
+                      <div className="absolute top-4 right-4 bg-black/80 backdrop-blur-sm px-3 py-1 text-xs font-semibold text-white border border-ink/10">
                          KES {product.price.toLocaleString()}
                       </div>
                     </div>
@@ -223,7 +225,7 @@ export default function Home() {
              {testimonials.map((t, i) => (
                <motion.div 
                  key={t.id} 
-                 className="bg-sand/5 p-8 border border-white/5 hover:border-terracotta/30 transition-colors"
+                 className="bg-sand/5 p-8 border border-ink/5 hover:border-terracotta/30 transition-colors"
                  initial={{ opacity: 0, y: 30 }}
                  whileInView={{ opacity: 1, y: 0 }}
                  viewport={{ once: true }}

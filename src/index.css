@@ -5,16 +5,32 @@
   --font-sans: "Montserrat", ui-sans-serif, system-ui, sans-serif;
   --font-serif: "Cormorant Garamond", ui-serif, Georgia, serif;
   
-  --color-sand: #0A0A0A;
-  --color-ink: #F5F5F0;
-  --color-espresso: #111111;
+  --color-sand: var(--color-sand-var);
+  --color-ink: var(--color-ink-var);
+  --color-espresso: var(--color-espresso-var);
   --color-terracotta: #C5A059;
-  --color-olive: #1A1A1A;
+  --color-olive: var(--color-olive-var);
+}
+
+:root {
+  /* Light theme variables */
+  --color-sand-var: #F5F5F0;
+  --color-ink-var: #0A0A0A;
+  --color-espresso-var: #E8E8E3;
+  --color-olive-var: #DCDCD7;
+}
+
+:root.dark {
+  /* Dark theme variables */
+  --color-sand-var: #0A0A0A;
+  --color-ink-var: #F5F5F0;
+  --color-espresso-var: #111111;
+  --color-olive-var: #1A1A1A;
 }
 
 body {
-  background-color: var(--color-sand);
-  color: var(--color-ink);
+  background-color: var(--color-sand-var);
+  color: var(--color-ink-var);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
