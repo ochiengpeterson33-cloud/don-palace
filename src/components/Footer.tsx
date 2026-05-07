@@ -2,14 +2,14 @@ import { Facebook, Instagram, Twitter } from "lucide-react";
 
 export function Footer() {
   return (
-    <footer className="bg-espresso text-sand py-20 px-6 md:px-12 mt-20">
+    <footer className="bg-espresso text-ink py-20 px-6 md:px-12 mt-20">
       <div className="container mx-auto max-w-7xl grid grid-cols-1 md:grid-cols-4 gap-12">
         <div className="col-span-1 md:col-span-1">
           <div className="mb-6">
             <img 
               src="/logo.png" 
               alt="Don Palace Furniture" 
-              className="h-16 w-auto object-contain brightness-0 invert opacity-90"
+              className="h-16 w-auto object-contain opacity-90 mx-auto md:mx-0 dark:invert"
               onError={(e) => {
                 e.currentTarget.style.display = 'none';
                 const fallback = e.currentTarget.nextElementSibling;
@@ -21,7 +21,7 @@ export function Footer() {
                 <span className="text-terracotta font-serif italic text-lg font-bold">dp</span>
               </div>
               <div className="flex flex-col">
-                <span className="text-xl font-semibold tracking-tighter uppercase text-sand leading-none">Don Palace</span>
+                <span className="text-xl font-semibold tracking-tighter uppercase text-ink leading-none">Don Palace</span>
                 <span className="text-[10px] tracking-widest uppercase text-terracotta leading-none mt-1">Furniture</span>
               </div>
             </div>

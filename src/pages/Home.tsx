@@ -103,7 +103,7 @@ export default function Home() {
       </section>
 
       {/* Value Proposition */}
-      <section className="py-24 px-6 md:px-12 bg-espresso text-sand relative overflow-hidden">
+      <section className="py-24 px-6 md:px-12 bg-espresso text-ink relative overflow-hidden">
         <div className="absolute top-0 right-0 w-1/2 h-full opacity-10">
           {/* Subtle pattern or shape */}
              <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" className="w-full h-full fill-current">
