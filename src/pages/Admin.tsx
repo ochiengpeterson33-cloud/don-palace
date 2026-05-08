@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
-import { Plus, Edit, Trash2, Home, Package, ShoppingCart, Users, Settings, LogOut, Lock } from "lucide-react";
+import { Plus, Edit, Trash2, Home, Package, ShoppingCart, Users, Settings, LogOut, Lock, X } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "firebase/auth";
 import { auth, db } from "../lib/firebase";
 import { useProducts } from "../hooks/useProducts";
 import { useOrders } from "../hooks/useOrders";
 import { useInquiries } from "../hooks/useInquiries";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc, collection, addDoc, deleteDoc, serverTimestamp } from "firebase/firestore";
+import { motion } from "framer-motion";
 
 export default function Admin() {
   const [activeTab, setActiveTab] = useState("products");
@@ -15,6 +16,16 @@ export default function Admin() {
   const [loginError, setLoginError] = useState("");
   const navigate = useNavigate();
   
+  const [isProductModalOpen, setIsProductModalOpen] = useState(false);
+  const [isSubmittingProduct, setIsSubmittingProduct] = useState(false);
+  const [productForm, setProductForm] = useState({
+    name: "",
+    price: "",
+    category: "",
+    description: "",
+    images: "",
+  });
+
   const { products } = useProducts();
   const { orders } = useOrders();
   const { inquiries } = useInquiries();
@@ -62,6 +73,42 @@ export default function Admin() {
       navigate("/");
     } catch (err) {
       console.error("Logout failed", err);
+    }
+  };
+
+  const handleProductSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmittingProduct(true);
+    try {
+      const imagesArray = productForm.images.split(",").map(url => url.trim()).filter(url => url !== "");
+      const newProduct = {
+        name: productForm.name,
+        price: Number(productForm.price),
+        category: productForm.category,
+        description: productForm.description,
+        images: imagesArray.length > 0 ? imagesArray : ["https://placehold.co/600x400/1c1917/d4b476?text=No+Image"],
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      };
+      await addDoc(collection(db, "products"), newProduct);
+      setIsProductModalOpen(false);
+      setProductForm({ name: "", price: "", category: "", description: "", images: "" });
+    } catch (err) {
+      console.error("Failed to add product", err);
+      alert("Failed to add product");
+    } finally {
+      setIsSubmittingProduct(false);
+    }
+  };
+
+  const handleDeleteProduct = async (id: string) => {
+    if (window.confirm("Are you sure you want to delete this product?")) {
+      try {
+        await deleteDoc(doc(db, "products", id));
+      } catch (err: any) {
+        console.error("Failed to delete product", err);
+        alert(err.message || "Failed to delete product");
+      }
     }
   };
 
@@ -159,7 +206,7 @@ export default function Admin() {
           <div>
             <div className="flex justify-between items-center mb-8">
               <h1 className="text-3xl serif">Manage Products</h1>
-              <button className="bg-terracotta text-black px-4 py-2 rounded-none text-xs font-bold uppercase tracking-widest flex items-center hover:bg-[#D4B476] transition-colors">
+              <button onClick={() => setIsProductModalOpen(true)} className="bg-terracotta text-black px-4 py-2 rounded-none text-xs font-bold uppercase tracking-widest flex items-center hover:bg-[#D4B476] transition-colors">
                 <Plus className="w-4 h-4 mr-2" /> Add Product
               </button>
             </div>
@@ -187,7 +234,7 @@ export default function Admin() {
                         <button className="p-2 text-ink/60 hover:text-white transition-colors bg-white/5 rounded-none border border-ink/5">
                           <Edit className="w-4 h-4" />
                         </button>
-                        <button className="p-2 text-red-500/60 hover:text-red-500 transition-colors bg-white/5 rounded-none border border-ink/5">
+                        <button onClick={() => handleDeleteProduct(product.id)} className="p-2 text-red-500/60 hover:text-red-500 transition-colors bg-white/5 rounded-none border border-ink/5">
                           <Trash2 className="w-4 h-4" />
                         </button>
                       </td>
@@ -280,6 +327,92 @@ export default function Admin() {
            </div>
         )}
       </main>
+
+      {isProductModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="bg-sand text-ink w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-ink/10 shadow-2xl relative">
+            <button
+              onClick={() => setIsProductModalOpen(false)}
+              className="absolute top-4 right-4 p-2 hover:bg-black/5 rounded-full transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            <div className="p-8">
+              <h2 className="text-2xl serif mb-6">Add New Product</h2>
+              <form onSubmit={handleProductSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-xs uppercase tracking-widest font-semibold mb-2">Product Name *</label>
+                  <input
+                    required
+                    type="text"
+                    value={productForm.name}
+                    onChange={(e) => setProductForm(prev => ({ ...prev, name: e.target.value }))}
+                    className="w-full bg-white/5 border border-ink/20 p-3 text-sm focus:outline-none focus:border-terracotta transition-colors"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs uppercase tracking-widest font-semibold mb-2">Price (KES) *</label>
+                    <input
+                      required
+                      type="number"
+                      value={productForm.price}
+                      onChange={(e) => setProductForm(prev => ({ ...prev, price: e.target.value }))}
+                      className="w-full bg-white/5 border border-ink/20 p-3 text-sm focus:outline-none focus:border-terracotta transition-colors"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs uppercase tracking-widest font-semibold mb-2">Category *</label>
+                    <select
+                      required
+                      value={productForm.category}
+                      onChange={(e) => setProductForm(prev => ({ ...prev, category: e.target.value }))}
+                      className="w-full bg-white/5 border border-ink/20 p-3 text-sm focus:outline-none focus:border-terracotta transition-colors"
+                    >
+                      <option value="">Select Category</option>
+                      <option value="Sofa Set">Sofa Set</option>
+                      <option value="Bed">Bed</option>
+                      <option value="Dining Set">Dining Set</option>
+                      <option value="L Shaped Sofa">L Shaped Sofa</option>
+                      <option value="TV Stand">TV Stand</option>
+                      <option value="Coffee Table">Coffee Table</option>
+                    </select>
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs uppercase tracking-widest font-semibold mb-2">Description *</label>
+                  <textarea
+                    required
+                    rows={4}
+                    value={productForm.description}
+                    onChange={(e) => setProductForm(prev => ({ ...prev, description: e.target.value }))}
+                    className="w-full bg-white/5 border border-ink/20 p-3 text-sm focus:outline-none focus:border-terracotta transition-colors"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs uppercase tracking-widest font-semibold mb-2">Image URLs (comma separated)</label>
+                  <textarea
+                    rows={3}
+                    placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg"
+                    value={productForm.images}
+                    onChange={(e) => setProductForm(prev => ({ ...prev, images: e.target.value }))}
+                    className="w-full bg-white/5 border border-ink/20 p-3 text-sm focus:outline-none focus:border-terracotta transition-colors"
+                  />
+                </div>
+                <div className="pt-4 border-t border-ink/10 flex justify-end">
+                  <button
+                    type="submit"
+                    disabled={isSubmittingProduct}
+                    className="bg-terracotta text-black px-6 py-3 text-xs font-bold uppercase tracking-widest hover:bg-[#D4B476] transition-colors disabled:opacity-50"
+                  >
+                    {isSubmittingProduct ? "Saving..." : "Save Product"}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
