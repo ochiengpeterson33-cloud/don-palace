@@ -61,9 +61,13 @@ export default function Admin() {
     const provider = new GoogleAuthProvider();
     try {
       await signInWithPopup(auth, provider);
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      setLoginError("An error occurred during login.");
+      if (err.message && err.message.includes("popup")) {
+        setLoginError("Popup was blocked or closed. Please open the application in a new tab (click the arrow icon top-right) and try again.");
+      } else {
+        setLoginError(`An error occurred during login: ${err.message || err.toString()}`);
+      }
     }
   };
 
@@ -134,6 +138,7 @@ export default function Admin() {
             </div>
             <h1 className="text-2xl serif text-ink">Admin Portal</h1>
             <p className="text-xs uppercase tracking-widest opacity-50 mt-2">Restricted Access</p>
+            <p className="text-xs text-terracotta mt-4 bg-terracotta/10 p-3">Note: If login fails, please open the application in a new tab to allow popups.</p>
           </div>
 
           <div className="space-y-4">

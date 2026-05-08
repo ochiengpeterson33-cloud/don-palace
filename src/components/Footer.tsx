@@ -33,12 +33,13 @@ export function Footer() {
         </div>
         
         <div>
-          <h4 className="text-xs uppercase tracking-widest font-semibold mb-6">Collections</h4>
+          <h4 className="text-xs uppercase tracking-widest font-semibold mb-6">Quick Links</h4>
           <ul className="space-y-4 text-sm font-light opacity-70">
-            <li><a href="#" className="hover:text-terracotta transition-colors">Living Room</a></li>
-            <li><a href="#" className="hover:text-terracotta transition-colors">Dining</a></li>
-            <li><a href="#" className="hover:text-terracotta transition-colors">Bedroom</a></li>
-            <li><a href="#" className="hover:text-terracotta transition-colors">Office</a></li>
+            <li><a href="/" className="hover:text-terracotta transition-colors">Home</a></li>
+            <li><a href="/shop" className="hover:text-terracotta transition-colors">Shop</a></li>
+            <li><a href="/about" className="hover:text-terracotta transition-colors">About Us</a></li>
+            <li><a href="/contact" className="hover:text-terracotta transition-colors">Contact</a></li>
+            <li><a href="/admin" className="hover:text-terracotta transition-colors">Admin Panel</a></li>
           </ul>
         </div>
         
